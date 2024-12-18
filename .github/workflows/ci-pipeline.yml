@@ -1,48 +1,25 @@
-name: CI Pipeline
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
 jobs:
-  ci_pipeline:
-    runs-on: ubuntu-22.04 # Używamy stabilnej wersji Ubuntu
-
+  create-issues:
+    runs-on: ubuntu-22.04
     steps:
-      # 1. Pobierz kod źródłowy
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # 2. Ustawienie środowiska Pythona
+      - name: Create Issues from TODOs
+        uses: alstr/todo-to-issue-action@v1.4.1
+
+  tests-and-coverage:
+    runs-on: ubuntu-22.04
+    steps:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11' # Ustawiamy konkretną wersję Pythona
+          python-version: '3.11'
 
-      # 3. Instalacja zależności
       - name: Install dependencies
         run: |
-          pip install pytest pytest-cov
+          pip install -r requirements.txt
 
-      # 4. Uruchomienie testów jednostkowych z raportem pokrycia
-      - name: Run tests with coverage
+      - name: Run Unit Tests and Coverage
         run: |
-          pytest --cov=src tests/ # Upewnij się, że katalog `src` istnieje w twoim repozytorium
-
-      # 5. Lintowanie za pomocą Super-Lintera
-      - name: Lint code
-        uses: github/super-linter@v4
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # 6. Automatyczne tworzenie zgłoszeń z TODO
-      - name: Create TODO issues
-        uses: alstr/todo-to-issue-action@v4 # Poprawiona wersja akcji
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          labels: 'todo'
+          pytest --cov

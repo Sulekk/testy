@@ -10,7 +10,7 @@ on:
 
 jobs:
   ci_pipeline:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04 # Używamy stabilnej wersji Ubuntu
 
     steps:
       # 1. Pobierz kod źródłowy
@@ -21,7 +21,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.11' # Ustawiamy konkretną wersję Pythona
 
       # 3. Instalacja zależności
       - name: Install dependencies
@@ -31,7 +31,7 @@ jobs:
       # 4. Uruchomienie testów jednostkowych z raportem pokrycia
       - name: Run tests with coverage
         run: |
-          pytest --cov=src tests/
+          pytest --cov=src tests/ # Upewnij się, że katalog `src` istnieje w twoim repozytorium
 
       # 5. Lintowanie za pomocą Super-Lintera
       - name: Lint code
@@ -42,7 +42,7 @@ jobs:
 
       # 6. Automatyczne tworzenie zgłoszeń z TODO
       - name: Create TODO issues
-        uses: alstr/todo-to-issue-action@v4
+        uses: alstr/todo-to-issue-action@v4 # Poprawiona wersja akcji
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           labels: 'todo'

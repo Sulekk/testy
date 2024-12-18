@@ -1,0 +1,48 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci_pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Pobierz kod źródłowy
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Ustawienie środowiska Pythona
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      # 3. Instalacja zależności
+      - name: Install dependencies
+        run: |
+          pip install pytest pytest-cov
+
+      # 4. Uruchomienie testów jednostkowych z raportem pokrycia
+      - name: Run tests with coverage
+        run: |
+          pytest --cov=src tests/
+
+      # 5. Lintowanie za pomocą Super-Lintera
+      - name: Lint code
+        uses: github/super-linter@v4
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 6. Automatyczne tworzenie zgłoszeń z TODO
+      - name: Create TODO issues
+        uses: alstr/todo-to-issue-action@v4
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          labels: 'todo'
